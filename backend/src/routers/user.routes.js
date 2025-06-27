@@ -24,9 +24,9 @@ router.route("/login").post(loginuser)
 
 router.route("/logout").post(verifyJWT,logoutuser)
 
-router.route("/subscribe/:userbId").put(verifyJWT,subscribe)
+router.route("/subscribe/:userId").put(verifyJWT,subscribe)
 
-router.route("/unsubscribe/:userbId").put(verifyJWT,unsubscribe)
+router.route("/unsubscribe/:userId").put(verifyJWT,unsubscribe)
 
 
 export default router;

@@ -143,43 +143,83 @@ const logoutuser = AsyncHandler(async (req, res) => {
         );
 });
 
-const subscribe = AsyncHandler(async (req, res) =>{
-    const userA = await User.findById(req.user._id)
-    const userB = await User.findById(req.params.userbId)
+const subscribe = AsyncHandler(async (req, res) => {
+    try {
+        // Fixed parameter name from userbId to userId
+        const userA = await User.findById(req.user._id)
+        const userB = await User.findById(req.params.userId)
 
-    if (userB.subscribedBy.includes(userA._id)){
-        return res.status(400).json(
-            new ApiResponse(400, {}, "You are already subscribed to this user"))
+        if (!userA) {
+            throw new ApiError(404, "Current user not found")
+        }
+
+        if (!userB) {
+            throw new ApiError(404, "User to subscribe to not found")
+        }
+
+        // Check if user is trying to subscribe to themselves
+        if (userA._id.toString() === userB._id.toString()) {
+            throw new ApiError(400, "You cannot subscribe to yourself")
+        }
+
+        if (userB.subscribedBy.includes(userA._id)) {
+            return res.status(400).json(
+                new ApiResponse(400, {}, "You are already subscribed to this user")
+            )
+        }
+
+        userB.subscribers += 1
+        userB.subscribedBy.push(userA._id)
+        await userB.save()
+        
+        userA.subscribedChannels.push(userB._id)
+        await userA.save()
+
+        return res.status(200).json(
+            new ApiResponse(200, {}, "You have successfully subscribed to this user")
+        )
+
+    } catch (error) {
+        console.error("Subscribe error:", error)
+        throw new ApiError(500, error.message || "Error while subscribing")
     }
-    userB.subscribers += 1
-    userB.subscribedBy.push(userA._id)
-    await userB.save()
-    userA.subscribedChannels.push(userB._id)
-    await userA.save()
-
-    return res.status(200).json(
-        new ApiResponse(200, {}, "You have successfully subscribed to this user"))
-
 })
 
-const unsubscribe = AsyncHandler(async (req, res) =>{
-    const userA = await User.findById(req.user._id)
-    const userB = await User.findById(req.params.userbId)
-    if (!userB.subscribedBy.includes(userA._id)){
-        return res.status(400).json(
-            new ApiResponse(400, {}, "You are not subscribed to this user"))
-            }
-    
-    if(userB.subscribedBy.includes(userA._id)){
+const unsubscribe = AsyncHandler(async (req, res) => {
+    try {
+        // Fixed parameter name from userbId to userId
+        const userA = await User.findById(req.user._id)
+        const userB = await User.findById(req.params.userId)
+
+        if (!userA) {
+            throw new ApiError(404, "Current user not found")
+        }
+
+        if (!userB) {
+            throw new ApiError(404, "User to unsubscribe from not found")
+        }
+
+        if (!userB.subscribedBy.includes(userA._id)) {
+            return res.status(400).json(
+                new ApiResponse(400, {}, "You are not subscribed to this user")
+            )
+        }
+
         userB.subscribers -= 1
         userB.subscribedBy = userB.subscribedBy.filter(userid => userid.toString() !== userA._id.toString())
         await userB.save()
+        
         userA.subscribedChannels = userA.subscribedChannels.filter(userid => userid.toString() !== userB._id.toString())
         await userA.save()
+
+        return res.status(200).json(
+            new ApiResponse(200, {}, "You have successfully unsubscribed from this user")
+        )
+
+    } catch (error) {
+        console.error("Unsubscribe error:", error)
+        throw new ApiError(500, error.message || "Error while unsubscribing")
     }
-    return res.status(200).json(
-        new ApiResponse(200, {}, "You have successfully unsubscribed from this user")
-    )
 })
 
 export {registration,
