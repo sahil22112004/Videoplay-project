@@ -5,6 +5,8 @@ import {Video} from "../models/video.model.js"
 import {uploadOnCloudinary} from "../utils/cloudinary.js"
 import { v2 as cloudinary } from 'cloudinary';
 import {User} from "../models/user.model.js"
+import jwt from "jsonwebtoken";
+
 
 
 const uploadVideo = AsyncHandler(async (req,res)=>{
@@ -276,8 +278,15 @@ const openVideo = AsyncHandler(async (req, res) => {
   await videodoc.save();
 
   const video = videodoc.toObject();  // convert to plain object
+  console.log(video)
 
-  const userId = req.user?._id?.toString();
+  const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
+
+  let decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+
+  const userId = decodedToken?._id
+
+  console.log("userid iis : "+userId)
 
   // ✅ Check like/dislike status *before* deleting arrays
   const liked = userId ? videodoc.likedBy.some(id => id.toString() === userId) : false;
