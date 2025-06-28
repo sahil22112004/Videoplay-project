@@ -218,63 +218,53 @@ const getHomeVideos = AsyncHandler(async (req, res) => {
   let selectedVideos = [];
 
   if (loggedInUserId) {
-    // 🧠 Get logged-in user with subscribed channels
+    // 🔍 Get the logged-in user's subscribed channels
     const user = await User.findById(loggedInUserId).select("subscribedChannels");
 
-    // 🎯 Get videos from subscribed channels (most recent first)
+    // 🎯 Videos from subscribed channels
     const subscribedVideos = await Video.find({
       userId: { $in: user.subscribedChannels }
     })
       .populate("userId", "userName avatar")
-      .sort({ createdAt: -1 }); // latest first
+      .sort({ createdAt: -1 }); // Latest first
 
+    // 🎯 Videos from other users (not the logged-in user or their subscriptions)
     const otherVideos = await Video.find({
       userId: { $ne: loggedInUserId, $nin: user.subscribedChannels }
     })
       .populate("userId", "userName avatar")
-      .sort({ createdAt: -1 }); // latest first
+      .sort({ createdAt: -1 }); // Latest first
 
-    // Merge videos
-    const combined = [...subscribedVideos, ...otherVideos];
+    // Combine both sets, with subscribed videos first
+    let combined = [...subscribedVideos, ...otherVideos];
 
+    // Take up to 30 videos
     if (combined.length >= 30) {
-      // Randomly pick 30 (to add variety, you can change this if you want latest top 30)
-      const pickedSet = new Set();
-      while (pickedSet.size < 30) {
-        const randIndex = Math.floor(Math.random() * combined.length);
-        pickedSet.add(combined[randIndex]);
-      }
-      selectedVideos = Array.from(pickedSet);
+      selectedVideos = combined.slice(0, 30);
     } else {
-      selectedVideos = combined;
-
+      // Not enough videos, add the user's own videos to fill the rest
       const remaining = 30 - combined.length;
 
       const myVideos = await Video.find({ userId: loggedInUserId })
         .populate("userId", "userName avatar")
-        .sort({ createdAt: -1 }) // recent uploads
+        .sort({ createdAt: -1 })
         .limit(remaining);
 
-      selectedVideos = [...selectedVideos, ...myVideos];
+      selectedVideos = [...combined, ...myVideos];
     }
   } else {
-    // 🎯 Not logged in: pick most recent 30 videos
-    const allVideos = await Video.find({})
+    // 🧑‍🦲 Not logged in – fetch latest 30 videos
+    selectedVideos = await Video.find({})
       .populate("userId", "userName avatar")
-      .sort({ createdAt: -1 });
-
-    const pickedSet = new Set();
-    while (pickedSet.size < Math.min(30, allVideos.length)) {
-      const randIndex = Math.floor(Math.random() * allVideos.length);
-      pickedSet.add(allVideos[randIndex]);
-    }
-    selectedVideos = Array.from(pickedSet);
+      .sort({ createdAt: -1 })
+      .limit(30); // no shuffling
   }
 
   return res.status(200).json(
     new ApiResponse(200, selectedVideos, "Home videos fetched successfully")
   );
 });
+
 
 
 const openVideo = AsyncHandler(async (req, res) => {
