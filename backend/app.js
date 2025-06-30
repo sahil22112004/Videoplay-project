@@ -21,11 +21,13 @@ app.use(cookieparser( ))
 import userRouter from "./src/routers/user.routes.js"
 import vedioRouter from "./src/routers/vedio.routes.js"
 import commentRouter from "./src/routers/comment.routes.js"
+import checkTokenRute from "./src/routers/checkToken.route.js"
 
 
 app.use("/user",userRouter)
 app.use("/vedio",vedioRouter)
 app.use("/comment",commentRouter)
+app.use("/checkToken",checkTokenRute)
 
 
 
