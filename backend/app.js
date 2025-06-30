@@ -16,7 +16,6 @@ app.use(express.urlencoded({extended:true, limit:"16kb"}))
 app.use(express.static("public"))
 app.use(cookieparser( ))
 
-// importing router
 
 import userRouter from "./src/routers/user.routes.js"
 import vedioRouter from "./src/routers/vedio.routes.js"
@@ -31,6 +30,6 @@ app.use("/checkToken",checkTokenRute)
 
 
 
-app.use(errorHandler); //  this must be at the END, after routes
+app.use(errorHandler); 
 
 export{app}
