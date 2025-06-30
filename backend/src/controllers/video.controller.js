@@ -238,22 +238,37 @@ const openVideo = AsyncHandler(async (req, res) => {
     if (!videodoc) {
         throw new ApiError(404, "Video not found");
     }
+    const video = videodoc.toObject();
+
+    let userId = null;
+    let liked = false;
+    let disliked = false;
+    let isSubscribed = false;
+    const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
+
 
     videodoc.views += 1;
     await videodoc.save();
 
-    const video = videodoc.toObject();
-    const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
-    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-    const userId = decodedToken?._id;
-
-    const liked = userId ? videodoc.likedBy.some(id => id.toString() === userId) : false;
-    const disliked = userId ? videodoc.dislikedBy.some(id => id.toString() === userId) : false;
-    const isSubscribed = userId ? videodoc.userId.subscribedBy.some(id => id.toString() === userId) : false;
+    if(token){
+    try {
+      const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+      userId = decodedToken?._id;
+  
+      liked = userId ? videodoc.likedBy.some(id => id.toString() === userId) : false;
+      disliked = userId ? videodoc.dislikedBy.some(id => id.toString() === userId) : false;
+      isSubscribed = userId ? videodoc.userId.subscribedBy.some(id => id.toString() === userId) : false;
+    } catch (error) {
+      console.log(error)
+      
+    }
+  }
 
     delete video.likedBy;
     delete video.dislikedBy;
-    delete video.userId.subscribedBy;
+    if (video.userId?.subscribedBy) {
+        delete video.userId.subscribedBy;
+    }
 
     return res.status(200).json(
         new ApiResponse(200, { video, liked, disliked, isSubscribed }, "Video opened successfully")
