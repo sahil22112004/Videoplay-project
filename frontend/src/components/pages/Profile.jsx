@@ -7,7 +7,7 @@ import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const BASE_URL = import.meta.env.API_URL;
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 const Profile = () => {
   const { user, token } = useSelector((state) => state.auth);
@@ -26,7 +26,7 @@ const Profile = () => {
 
     setLoading(true);
     try {
-      const response = await axios.get(`${BASE_URL}/api/vedio/myVideo`, {
+      const response = await axios.get(`${BASE_URL}/vedio/myVideo`, {
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${token}`,

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MessageCircle, MoreVertical, Edit, Trash2, X, Check, Crown, Send } from 'lucide-react';
 
-const BASE_URL = import.meta.env.API_URL;
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 const Comment = ({ videoId, isAuthenticated, token, user }) => {
   const [comments, setComments] = useState([]);
@@ -50,7 +50,7 @@ const Comment = ({ videoId, isAuthenticated, token, user }) => {
 
   const fetchComments = async () => {
     try {
-      const response = await fetch(`${BASE_URL}/api/comment/${videoId}`, {
+      const response = await fetch(`${BASE_URL}/comment/${videoId}`, {
         headers: { 'Authorization': `Bearer ${token}` },
       });
       const data = await response.json();
@@ -62,7 +62,7 @@ const Comment = ({ videoId, isAuthenticated, token, user }) => {
     if (!newComment.trim() || !isAuthenticated) return;
     setLoading(true);
     try {
-      const response = await fetch(`${BASE_URL}/api/comment/new-comment/${videoId}`, {
+      const response = await fetch(`${BASE_URL}/comment/new-comment/${videoId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -82,7 +82,7 @@ const Comment = ({ videoId, isAuthenticated, token, user }) => {
   const handleEditComment = async (commentId) => {
     if (!editText.trim()) return;
     try {
-      const response = await fetch(`${BASE_URL}/api/comment/${commentId}`, {
+      const response = await fetch(`${BASE_URL}/comment/${commentId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -100,7 +100,7 @@ const Comment = ({ videoId, isAuthenticated, token, user }) => {
 
   const handleDeleteComment = async (commentId) => {
     try {
-      const response = await fetch(`${BASE_URL}/api/comment/deletecomment/${commentId}`, {
+      const response = await fetch(`${BASE_URL}/comment/deletecomment/${commentId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` },
       });

@@ -8,7 +8,7 @@ import { useSelector } from "react-redux";
 import RelatedVideo from './relatedVideo.jsx';
 import Comment from './comments.jsx';
 
-const BASE_URL = import.meta.env.API_URL;
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 const WatchPage = () => {
   const { videoId } = useParams();
@@ -32,7 +32,7 @@ const WatchPage = () => {
   useEffect(() => {
     const fetchVideo = async () => {
       try {
-        const response = await axios.get(`${BASE_URL}/api/vedio/openvideo/${videoId}`, {
+        const response = await axios.get(`${BASE_URL}/vedio/openvideo/${videoId}`, {
           withCredentials: true,
           headers: {
             "Authorization": `Bearer ${token}`,

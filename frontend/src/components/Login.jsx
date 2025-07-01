@@ -7,7 +7,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useDispatch } from "react-redux";
 import { loginSuccess } from '../store/auth/authslice.js';
 
-const BASE_URL = import.meta.env.API_URL;
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -21,7 +21,7 @@ function Login() {
     if (loading) return;
     setLoading(true);
 
-    axios.post(`${BASE_URL}/api/user/login`, {
+    axios.post(`${BASE_URL}/user/login`, {
       email,
       password
     }, { withCredentials: true })

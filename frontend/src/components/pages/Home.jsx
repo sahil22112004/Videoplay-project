@@ -3,7 +3,7 @@ import axios from "axios";
 import VideoCard from "../videos/AllVideoCard.jsx";
 import { toast } from "react-toastify";
 
-const BASE_URL = import.meta.env.API_URL;
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 const Home = () => {
   const [videos, setVideos] = useState([]);
@@ -12,7 +12,7 @@ const Home = () => {
   useEffect(() => {
     const fetchVideos = async () => {
       try {
-        const res = await axios.get(`${BASE_URL}/api/vedio/homeVideo`, {
+        const res = await axios.get(`${BASE_URL}/vedio/homeVideo`, {
           withCredentials: true,
         });
         setVideos(res.data.data || []);

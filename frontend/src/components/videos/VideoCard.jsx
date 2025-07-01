@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import axios from "axios";
 
-const BASE_URL = import.meta.env.API_URL;
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 const VideoCard = ({ video, onVideoDeleted }) => {
   const [showMenu, setShowMenu] = useState(false);
@@ -37,7 +37,7 @@ const VideoCard = ({ video, onVideoDeleted }) => {
 
     setIsDeleting(true);
     try {
-      await axios.delete(`${BASE_URL}/api/vedio/${video._id}`, {
+      await axios.delete(`${BASE_URL}/vedio/${video._id}`, {
         headers: {
           "Authorization": `Bearer ${token}`,
         },

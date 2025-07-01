@@ -45,7 +45,7 @@ const UploadVideo = () => {
     const token = localStorage.getItem("token");
 
     try {
-      await axios.post(`${BASE_URL}/api/vedio/uploadVideo`, data, {
+      await axios.post(`${BASE_URL}/vedio/uploadVideo`, data, {
         withCredentials: true,
         headers: {
           "Authorization": `Bearer ${token}`,

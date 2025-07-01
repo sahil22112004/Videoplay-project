@@ -5,7 +5,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, Link } from 'react-router-dom';
 
-const BASE_URL = import.meta.env.API_URL;
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 function Signup() {
   const [channelName, setChannelName] = useState("");
@@ -37,7 +37,7 @@ function Signup() {
     formData.append("avatar", avatar);
     formData.append("coverImage", coverImage);
 
-    axios.post(`${BASE_URL}/api/user/register`, formData)
+    axios.post(`${BASE_URL}/user/register`, formData)
       .then(() => {
         toast.success("Successfully signed up!");
         setLoading(false);

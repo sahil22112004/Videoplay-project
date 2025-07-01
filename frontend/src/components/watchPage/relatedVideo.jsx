@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import RelatedVideoCard from "../videos/RelatedVideoCard.jsx";
 
-const BASE_URL = import.meta.env.API_URL;
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 const RelatedVideo = ({ currentVideoId }) => {
   const [relatedVideos, setRelatedVideos] = useState([]);
@@ -14,7 +14,7 @@ const RelatedVideo = ({ currentVideoId }) => {
       try {
         setLoading(true);
         setError("");
-        const { data } = await axios.get(`${BASE_URL}/api/vedio/relatedvideo/${currentVideoId}`);
+        const { data } = await axios.get(`${BASE_URL}/vedio/relatedvideo/${currentVideoId}`);
         setRelatedVideos(data.data);
       } catch (err) {
         setRelatedVideos([]);
