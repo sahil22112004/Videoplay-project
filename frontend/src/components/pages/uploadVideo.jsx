@@ -1,8 +1,10 @@
-import React, { useState ,useRef  } from "react";
+import React, { useState, useRef } from "react";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 const UploadVideo = () => {
   const [formData, setFormData] = useState({
@@ -19,7 +21,6 @@ const UploadVideo = () => {
   const thumbnailRef = useRef(null);
   const videoRef = useRef(null);
 
-
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (files) {
@@ -29,7 +30,7 @@ const UploadVideo = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
@@ -40,36 +41,38 @@ const UploadVideo = () => {
     data.append("tags", formData.tags);
     data.append("thumbnail", formData.thumbnail);
     data.append("video", formData.video);
+
     const token = localStorage.getItem("token");
 
-    axios.post("/api/vedio/uploadVideo", data,{
-         withCredentials: true,
+    try {
+      await axios.post(`${BASE_URL}/api/vedio/uploadVideo`, data, {
+        withCredentials: true,
         headers: {
-        "Authorization": `Bearer ${token}`,
-        "Content-Type": "multipart/form-data",
-  },
-    })
-      .then((response) => {
-        setFormData({
-          title: "",
-          description: "",
-          category: "",
-          tags: "",
-          thumbnail: null,
-          video: null,
-        });
-          if (thumbnailRef.current) thumbnailRef.current.value = null;
-          if (videoRef.current) videoRef.current.value = null;
-        setLoading(false);
-        navigate("/profile");
-        toast.success("Video Uploaded Successfully");
-      })
-      .catch((err) => {
-        const message = err.response?.data?.message || "Something went wrong";
-        toast.error(message);
-        console.error("Upload error:", err);
-        setLoading(false);
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
       });
+
+      setFormData({
+        title: "",
+        description: "",
+        category: "",
+        tags: "",
+        thumbnail: null,
+        video: null,
+      });
+
+      if (thumbnailRef.current) thumbnailRef.current.value = null;
+      if (videoRef.current) videoRef.current.value = null;
+
+      toast.success("Video Uploaded Successfully");
+      navigate("/profile");
+    } catch (err) {
+      const message = err.response?.data?.message || "Something went wrong";
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -105,8 +108,8 @@ const UploadVideo = () => {
                     name="title"
                     value={formData.title}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors duration-200 outline-none"
-                    placeholder="Enter an engaging title for your video"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                    placeholder="Enter an engaging title"
                     required
                   />
                 </div>
@@ -120,7 +123,7 @@ const UploadVideo = () => {
                     value={formData.description}
                     onChange={handleChange}
                     rows={4}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors duration-200 outline-none resize-none"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none resize-none"
                     placeholder="Describe your video content..."
                   />
                 </div>
@@ -134,7 +137,7 @@ const UploadVideo = () => {
                       name="category"
                       value={formData.category}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors duration-200 outline-none"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
                     >
                       <option value="">Select category</option>
                       <option value="education">Education</option>
@@ -156,7 +159,7 @@ const UploadVideo = () => {
                       name="tags"
                       value={formData.tags}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors duration-200 outline-none"
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
                       placeholder="tag1, tag2, tag3"
                     />
                   </div>
@@ -173,7 +176,7 @@ const UploadVideo = () => {
                       accept="image/*"
                       ref={thumbnailRef}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 transition-colors duration-200 cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                      className="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg file:py-2 file:px-4 file:bg-blue-50 file:text-blue-700"
                     />
                   </div>
 
@@ -187,7 +190,7 @@ const UploadVideo = () => {
                       accept="video/*"
                       ref={videoRef}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 transition-colors duration-200 cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                      className="w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg file:py-2 file:px-4 file:bg-blue-50 file:text-blue-700"
                       required
                     />
                   </div>
@@ -196,9 +199,9 @@ const UploadVideo = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className={`w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold py-4 px-6 rounded-lg transform transition-all duration-200 shadow-lg
-                    ${loading ? 'opacity-50 cursor-not-allowed' : 'hover:from-blue-700 hover:to-indigo-700 hover:scale-105 hover:shadow-xl'}
-                  `}
+                  className={`w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold py-4 px-6 rounded-lg transition-all duration-200 shadow-lg ${
+                    loading ? "opacity-50 cursor-not-allowed" : "hover:scale-105"
+                  }`}
                 >
                   {loading ? (
                     <i className="fa-solid fa-spinner fa-spin-pulse"></i>
@@ -229,68 +232,56 @@ const UploadVideo = () => {
               </div>
 
               <div className="space-y-6">
-                <div className="relative">
+                {/* Thumbnail Preview */}
+                <div>
                   {formData.thumbnail ? (
-                    <div className="relative group">
-                      <img
-                        src={URL.createObjectURL(formData.thumbnail)}
-                        alt="Thumbnail preview"
-                        className="w-full h-48 sm:h-56 object-cover rounded-xl shadow-lg"
-                      />
-                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 rounded-xl flex items-center justify-center">
-                        <svg className="w-16 h-16 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M8 5v14l11-7z" />
-                        </svg>
-                      </div>
-                    </div>
+                    <img
+                      src={URL.createObjectURL(formData.thumbnail)}
+                      alt="Thumbnail preview"
+                      className="w-full h-48 sm:h-56 object-cover rounded-xl shadow-lg"
+                    />
                   ) : (
-                    <div className="w-full h-48 sm:h-56 bg-gray-100 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center">
-                      <div className="text-center">
-                        <svg className="w-12 h-12 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                        <p className="text-gray-500 text-sm">Thumbnail preview will appear here</p>
-                      </div>
+                    <div className="w-full h-48 sm:h-56 bg-gray-100 rounded-xl flex items-center justify-center">
+                      <span className="text-gray-500">Thumbnail preview will appear here</span>
                     </div>
                   )}
                 </div>
 
-                <div className="space-y-4">
-                  <h3 className="text-xl font-bold text-gray-900 leading-tight">
-                    {formData.title || "Your video title will appear here"}
-                  </h3>
+                <h3 className="text-xl font-bold text-gray-900">
+                  {formData.title || "Your video title will appear here"}
+                </h3>
 
-                  <p className="text-gray-600 leading-relaxed">
-                    {formData.description || "Your video description will appear here..."}
-                  </p>
+                <p className="text-gray-600">
+                  {formData.description || "Your video description will appear here..."}
+                </p>
 
-                  <div className="flex flex-wrap gap-2">
-                    {formData.category && (
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 border border-blue-200">
-                        {formData.category}
-                      </span>
-                    )}
-                    {formData.tags && formData.tags.split(',').map((tag, index) => (
-                      <span key={index} className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700 border border-gray-200">
+                <div className="flex flex-wrap gap-2">
+                  {formData.category && (
+                    <span className="bg-blue-100 text-blue-800 px-3 py-1 text-xs rounded-full">
+                      {formData.category}
+                    </span>
+                  )}
+                  {formData.tags &&
+                    formData.tags.split(',').map((tag, index) => (
+                      <span key={index} className="bg-gray-200 text-gray-700 px-3 py-1 text-xs rounded-full">
                         #{tag.trim()}
                       </span>
                     ))}
-                  </div>
-
-                  {formData.video && (
-                    <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
-                      <p className="text-sm text-green-800 font-medium">
-                        ✓ Video file selected: {formData.video.name}
-                      </p>
-                    </div>
-                  )}
                 </div>
+
+                {formData.video && (
+                  <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <p className="text-sm text-green-800 font-medium">
+                      ✓ Video file selected: {formData.video.name}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
         </form>
       </div>
-            <ToastContainer position="top-right" autoClose={3000} />
+      <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 };

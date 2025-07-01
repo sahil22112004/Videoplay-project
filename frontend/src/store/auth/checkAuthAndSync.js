@@ -1,8 +1,9 @@
 import { logout } from "./authslice.js";
+const BASE_URL = import.meta.env.API_URL;
 
 export const checkBackendAuth = () => async (dispatch) => {
   try {
-    const res = await fetch("/api/checkToken/check", {
+    const res = await fetch(`${BASE_URL}/checkToken/check`, {
       method: "GET",
       credentials: "include"
     });

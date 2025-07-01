@@ -3,18 +3,20 @@ import axios from "axios";
 import VideoCard from "../videos/AllVideoCard.jsx";
 import { toast } from "react-toastify";
 
+const BASE_URL = import.meta.env.API_URL;
+
 const Home = () => {
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch home videos on mount
   useEffect(() => {
     const fetchVideos = async () => {
       try {
-        const res = await axios.get("/api/vedio/homeVideo"); // Adjust URL if needed
+        const res = await axios.get(`${BASE_URL}/api/vedio/homeVideo`, {
+          withCredentials: true,
+        });
         setVideos(res.data.data || []);
       } catch (error) {
-        console.error("Failed to load videos:", error);
         toast.error("Failed to load videos");
       } finally {
         setLoading(false);

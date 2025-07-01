@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MessageCircle, MoreVertical, Edit, Trash2, X, Check, Crown, Send } from 'lucide-react';
 
+const BASE_URL = import.meta.env.API_URL;
+
 const Comment = ({ videoId, isAuthenticated, token, user }) => {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
@@ -13,24 +15,18 @@ const Comment = ({ videoId, isAuthenticated, token, user }) => {
   const menuRef = useRef(null);
 
   useEffect(() => {
-    if (videoId) {
-      fetchComments();
-    }
+    if (videoId) fetchComments();
   }, [videoId]);
 
-  // Handle click outside for menu only
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
         setShowMenu(null);
       }
     };
-
     if (showMenu) {
       document.addEventListener('mousedown', handleClickOutside);
-      return () => {
-        document.removeEventListener('mousedown', handleClickOutside);
-      };
+      return () => document.removeEventListener('mousedown', handleClickOutside);
     }
   }, [showMenu]);
 
@@ -54,24 +50,19 @@ const Comment = ({ videoId, isAuthenticated, token, user }) => {
 
   const fetchComments = async () => {
     try {
-      const response = await fetch(`/api/comment/${videoId}`, {
+      const response = await fetch(`${BASE_URL}/api/comment/${videoId}`, {
         headers: { 'Authorization': `Bearer ${token}` },
       });
       const data = await response.json();
-      if (data.success) {
-        setComments(data.data.commentList);
-      }
-    } catch (error) {
-      console.error('Error fetching comments:', error);
-    }
+      if (data.success) setComments(data.data.commentList);
+    } catch (error) {}
   };
 
   const handleAddComment = async () => {
     if (!newComment.trim() || !isAuthenticated) return;
-    
     setLoading(true);
     try {
-      const response = await fetch(`/api/comment/new-comment/${videoId}`, {
+      const response = await fetch(`${BASE_URL}/api/comment/new-comment/${videoId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -79,23 +70,19 @@ const Comment = ({ videoId, isAuthenticated, token, user }) => {
         },
         body: JSON.stringify({ commentText: newComment }),
       });
-      
       const data = await response.json();
       if (data.success) {
         setNewComment('');
         fetchComments();
       }
-    } catch (error) {
-      console.error('Error adding comment:', error);
-    }
+    } catch (error) {}
     setLoading(false);
   };
 
   const handleEditComment = async (commentId) => {
     if (!editText.trim()) return;
-    
     try {
-      const response = await fetch(`/api/comment/${commentId}`, {
+      const response = await fetch(`${BASE_URL}/api/comment/${commentId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -103,30 +90,22 @@ const Comment = ({ videoId, isAuthenticated, token, user }) => {
         },
         body: JSON.stringify({ commentText: editText }),
       });
-      
       if (response.ok) {
         setEditingComment(null);
         setEditText('');
         fetchComments();
       }
-    } catch (error) {
-      console.error('Error updating comment:', error);
-    }
+    } catch (error) {}
   };
 
   const handleDeleteComment = async (commentId) => {
     try {
-      const response = await fetch(`/api/comment/deletecomment/${commentId}`, {
+      const response = await fetch(`${BASE_URL}/api/comment/deletecomment/${commentId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` },
       });
-      
-      if (response.ok) {
-        fetchComments();
-      }
-    } catch (error) {
-      console.error('Error deleting comment:', error);
-    }
+      if (response.ok) fetchComments();
+    } catch (error) {}
     setShowMenu(null);
     setDeleteConfirm(null);
   };
@@ -135,7 +114,6 @@ const Comment = ({ videoId, isAuthenticated, token, user }) => {
     const now = new Date();
     const commentDate = new Date(dateString);
     const diffInSeconds = Math.floor((now - commentDate) / 1000);
-    
     if (diffInSeconds < 60) return 'just now';
     if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
     if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
@@ -144,9 +122,7 @@ const Comment = ({ videoId, isAuthenticated, token, user }) => {
     return `${Math.floor(diffInSeconds / 31536000)}y ago`;
   };
 
-  const isVideoOwner = (commentUserId) => {
-    return false; // You can pass videoOwnerId as prop to enable this
-  };
+  const isVideoOwner = () => false;
 
   const shouldShowReadMore = (text) => {
     const lines = text.split('\n');
@@ -155,16 +131,9 @@ const Comment = ({ videoId, isAuthenticated, token, user }) => {
 
   const getDisplayText = (text, commentId) => {
     const isExpanded = expandedComments.has(commentId);
-    
-    if (!shouldShowReadMore(text) || isExpanded) {
-      return text;
-    }
-    
+    if (!shouldShowReadMore(text) || isExpanded) return text;
     const lines = text.split('\n');
-    if (lines.length > 3) {
-      return lines.slice(0, 3).join('\n');
-    }
-    
+    if (lines.length > 3) return lines.slice(0, 3).join('\n');
     return text.length > 200 ? text.substring(0, 200) : text;
   };
 
@@ -186,7 +155,6 @@ const Comment = ({ videoId, isAuthenticated, token, user }) => {
   return (
     <>
       <div className="w-full p-6 bg-white pb-20">
-        {/* Modern Comment Input - Only show if authenticated */}
         {isAuthenticated ? (
           <div className="mb-8">
             <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-gray-300 transition-colors">
@@ -206,9 +174,7 @@ const Comment = ({ videoId, isAuthenticated, token, user }) => {
                   />
                   {newComment.trim() && (
                     <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-200">
-                      <span className="text-xs text-gray-500">
-                        {newComment.length} characters
-                      </span>
+                      <span className="text-xs text-gray-500">{newComment.length} characters</span>
                       <div className="flex gap-2">
                         <button
                           onClick={() => setNewComment('')}
@@ -243,13 +209,11 @@ const Comment = ({ videoId, isAuthenticated, token, user }) => {
           </div>
         )}
 
-        {/* Comments Header */}
         <div className="flex items-center gap-2 mb-6">
           <MessageCircle className="w-5 h-5 text-gray-600" />
           <span className="font-semibold text-gray-900">{comments.length} Comments</span>
         </div>
 
-        {/* Comments List */}
         <div className="space-y-6">
           {comments.map((comment) => (
             <div key={comment._id} className="group">
@@ -259,25 +223,18 @@ const Comment = ({ videoId, isAuthenticated, token, user }) => {
                   alt={comment.userId?.userName}
                   className="w-9 h-9 rounded-full object-cover ring-2 ring-white shadow-sm"
                 />
-                
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="font-medium text-sm text-gray-900">
-                      @{comment.userId?.userName}
-                    </span>
+                    <span className="font-medium text-sm text-gray-900">@{comment.userId?.userName}</span>
                     {isVideoOwner(comment.userId?._id) && (
                       <Crown className="w-4 h-4 text-yellow-500" title="Video Owner" />
                     )}
-                    <span className="text-xs text-gray-500">
-                      {formatTimeAgo(comment.createdAt)}
-                    </span>
+                    <span className="text-xs text-gray-500">{formatTimeAgo(comment.createdAt)}</span>
                   </div>
-                  
                   <div className="text-sm text-gray-800 leading-relaxed">
                     <p className="break-words whitespace-pre-wrap" style={{ wordBreak: 'break-word' }}>
                       {getDisplayText(comment.commentText, comment._id)}
                     </p>
-                    
                     {shouldShowReadMore(comment.commentText) && (
                       <button
                         onClick={() => toggleExpanded(comment._id)}
@@ -289,7 +246,6 @@ const Comment = ({ videoId, isAuthenticated, token, user }) => {
                   </div>
                 </div>
 
-                {/* Menu for own comments */}
                 {isAuthenticated && user?._id === comment.userId?._id && (
                   <div className="relative opacity-0 group-hover:opacity-100 transition-opacity" ref={menuRef}>
                     <button
@@ -298,7 +254,6 @@ const Comment = ({ videoId, isAuthenticated, token, user }) => {
                     >
                       <MoreVertical className="w-4 h-4 text-gray-500" />
                     </button>
-                    
                     {showMenu === comment._id && (
                       <div className="absolute right-0 top-8 bg-white border border-gray-200 rounded-lg shadow-lg z-20 min-w-32">
                         <button
@@ -334,7 +289,6 @@ const Comment = ({ videoId, isAuthenticated, token, user }) => {
         </div>
       </div>
 
-      {/* Edit Comment Popup */}
       {editingComment && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl shadow-2xl border border-gray-200 w-full max-w-md mx-4">
@@ -350,7 +304,6 @@ const Comment = ({ videoId, isAuthenticated, token, user }) => {
                 <X className="w-5 h-5 text-gray-500" />
               </button>
             </div>
-            
             <div className="p-4">
               <textarea
                 value={editText}
@@ -360,7 +313,6 @@ const Comment = ({ videoId, isAuthenticated, token, user }) => {
                 placeholder="Edit your comment..."
               />
             </div>
-            
             <div className="flex justify-end gap-2 p-4 border-t border-gray-200">
               <button
                 onClick={() => {
@@ -384,7 +336,6 @@ const Comment = ({ videoId, isAuthenticated, token, user }) => {
         </div>
       )}
 
-      {/* Delete Confirmation Popup */}
       {deleteConfirm && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl shadow-2xl border border-gray-200 w-full max-w-sm mx-4">

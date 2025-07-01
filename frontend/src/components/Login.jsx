@@ -4,40 +4,36 @@ import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, Link } from 'react-router-dom';
-import { useDispatch } from "react-redux"
-import { loginSuccess} from '../store/auth/authslice.js'
+import { useDispatch } from "react-redux";
+import { loginSuccess } from '../store/auth/authslice.js';
+
+const BASE_URL = import.meta.env.API_URL;
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
-
   const navigate = useNavigate();
 
   const submitHandler = (e) => {
     e.preventDefault();
-    
-    // Prevent execution if already loading
     if (loading) return;
-    
     setLoading(true);
 
-    axios.post("/api/user/login", {
+    axios.post(`${BASE_URL}/api/user/login`, {
       email,
       password
     }, { withCredentials: true })
       .then((res) => {
         toast.success("Login successful!");
         const { accessToken, user } = res.data.data;
-        dispatch(
-        loginSuccess({
-          token: accessToken, // Assuming the token is in `response.data.token`
-          user: user,   // User data from the API
-        })
-      );
 
-        // Save to localStorage
+        dispatch(loginSuccess({
+          token: accessToken,
+          user: user,
+        }));
+
         localStorage.setItem("token", accessToken);
         localStorage.setItem("user", JSON.stringify(user));
 
@@ -54,13 +50,11 @@ function Login() {
   };
 
   const handleButtonClick = (e) => {
-    // Prevent any click events when loading
     if (loading) {
       e.preventDefault();
       e.stopPropagation();
       return false;
     }
-    console.log("click");
   };
 
   return (
@@ -93,10 +87,10 @@ function Login() {
             />
           </label>
 
-          <button 
+          <button
             type='submit'
             onClick={handleButtonClick}
-            disabled={loading} // HTML disabled attribute
+            disabled={loading}
             className={`${loading ? 'opacity-60 cursor-not-allowed pointer-events-none' : 'cursor-pointer hover:opacity-90'}`}
           >
             {loading ? (
@@ -107,7 +101,8 @@ function Login() {
           </button>
 
           <p style={{ marginTop: '1rem', textAlign: 'center' }}>
-            Don't have an account? <Link to="/signup" style={{ color: '#007bff', textDecoration: 'underline' }}>Sign Up</Link>
+            Don't have an account?{" "}
+            <Link to="/signup" style={{ color: '#007bff', textDecoration: 'underline' }}>Sign Up</Link>
           </p>
         </form>
       </div>

@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import axios from "axios";
 
+const BASE_URL = import.meta.env.API_URL;
+
 const VideoCard = ({ video, onVideoDeleted }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -10,7 +12,6 @@ const VideoCard = ({ video, onVideoDeleted }) => {
   const navigate = useNavigate();
   const { token } = useSelector((state) => state.auth);
   
-  // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -24,37 +25,28 @@ const VideoCard = ({ video, onVideoDeleted }) => {
     };
   }, []);
 
-
   const handleClick = () => {
     navigate(`/watch/${video._id}`);
   };
 
-
-
   const handleDelete = async (e) => {
-    e.stopPropagation()
+    e.stopPropagation();
     if (!window.confirm('Are you sure you want to delete this video?')) {
       return;
     }
-     console.log("Attempting to delete video with ID:", video._id);
-  console.log("Current user ID from token:", video.owner?._id || video.owner || video.userId?._id || video.userId); // optional chain fallback
-  
 
     setIsDeleting(true);
     try {
-      await axios.delete(`/api/vedio/${video._id}`, {
+      await axios.delete(`${BASE_URL}/api/vedio/${video._id}`, {
         headers: {
           "Authorization": `Bearer ${token}`,
         },
       });
-      
-      // Call callback to refresh the videos list
+
       if (onVideoDeleted) {
         onVideoDeleted(video._id);
       }
-      
     } catch (error) {
-      console.error('Error deleting video:', error);
       alert('Failed to delete video. Please try again.');
     } finally {
       setIsDeleting(false);
@@ -62,20 +54,17 @@ const VideoCard = ({ video, onVideoDeleted }) => {
     }
   };
 
-  // Handle update video
   const handleUpdate = (e) => {
-    e.stopPropagation()
+    e.stopPropagation();
     navigate('/update-video', { state: { video } });
     setShowMenu(false);
   };
 
-  // Toggle menu
   const toggleMenu = (e) => {
     e.stopPropagation();
     setShowMenu(!showMenu);
   };
-  
-  // Helper function to format view count
+
   const formatViews = (views) => {
     if (!views) return '0';
     if (views >= 1000000) {
@@ -86,7 +75,6 @@ const VideoCard = ({ video, onVideoDeleted }) => {
     return views.toString();
   };
 
-  // Helper function to format date
   const formatDate = (dateString) => {
     try {
       const date = new Date(dateString);
@@ -104,7 +92,6 @@ const VideoCard = ({ video, onVideoDeleted }) => {
     }
   };
 
-  // Helper function to truncate title
   const truncateTitle = (title, maxLength = 60) => {
     if (!title) return 'Untitled';
     return title.length > maxLength ? title.substring(0, maxLength) + '...' : title;
@@ -112,9 +99,9 @@ const VideoCard = ({ video, onVideoDeleted }) => {
 
   return (
     <div 
-    onClick={handleClick}
-    className="w-full max-w-sm cursor-pointer group hover:shadow-lg transition-all duration-300 rounded-xl overflow-hidden">
-      {/* Thumbnail */}
+      onClick={handleClick}
+      className="w-full max-w-sm cursor-pointer group hover:shadow-lg transition-all duration-300 rounded-xl overflow-hidden"
+    >
       <div className="relative w-full h-48 bg-gray-200 rounded-xl overflow-hidden">
         {video.thumbnail ? (
           <img
@@ -122,7 +109,7 @@ const VideoCard = ({ video, onVideoDeleted }) => {
             alt={video.title || 'Video thumbnail'}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             onError={(e) => {
-              e.target.src = '/default-thumbnail.jpg'; // Fallback image
+              e.target.src = '/default-thumbnail.jpg';
             }}
           />
         ) : (
@@ -132,8 +119,7 @@ const VideoCard = ({ video, onVideoDeleted }) => {
             </svg>
           </div>
         )}
-        
-        {/* Duration overlay (if available) */}
+
         {video.duration && (
           <div className="absolute bottom-2 left-2 bg-black bg-opacity-80 text-white text-xs px-2 py-1 rounded">
             {video.duration}
@@ -141,25 +127,22 @@ const VideoCard = ({ video, onVideoDeleted }) => {
         )}
       </div>
 
-      {/* Details */}
       <div className="flex mt-3 gap-3 p-2 relative">
-        {/* Avatar */}
         <div className="flex-shrink-0">
           <img
             src={video.owner?.avatar || video.userId?.avatar || '/default-avatar.jpg'}
             alt={video.owner?.userName || video.userId?.userName || 'User'}
             className="w-9 h-9 rounded-full object-cover border border-gray-200"
             onError={(e) => {
-              e.target.src = '/default-avatar.jpg'; // Fallback avatar
+              e.target.src = '/default-avatar.jpg';
             }}
           />
         </div>
 
-        {/* Text Info */}
         <div className="flex flex-col overflow-hidden flex-1 min-w-0">
           <h3 
             className="text-sm font-semibold text-gray-900 leading-tight mb-1 group-hover:text-blue-600 transition-colors"
-            title={video.title} // Show full title on hover
+            title={video.title}
           >
             {truncateTitle(video.title)}
           </h3>
@@ -175,7 +158,6 @@ const VideoCard = ({ video, onVideoDeleted }) => {
           </div>
         </div>
 
-        {/* Three dots menu - positioned at right side of text info */}
         <div className="flex-shrink-0 relative" ref={menuRef}>
           <button
             onClick={toggleMenu}
@@ -187,7 +169,6 @@ const VideoCard = ({ video, onVideoDeleted }) => {
             </svg>
           </button>
 
-          {/* Dropdown menu */}
           {showMenu && (
             <div className="absolute bottom-full right-0 mb-2 w-28 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
               <button

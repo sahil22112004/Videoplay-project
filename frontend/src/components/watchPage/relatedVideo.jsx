@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import RelatedVideoCard from "../videos/RelatedVideoCard.jsx";
 
+const BASE_URL = import.meta.env.API_URL;
+
 const RelatedVideo = ({ currentVideoId }) => {
   const [relatedVideos, setRelatedVideos] = useState([]);
   const [error, setError] = useState("");
@@ -12,7 +14,7 @@ const RelatedVideo = ({ currentVideoId }) => {
       try {
         setLoading(true);
         setError("");
-        const { data } = await axios.get(`/api/vedio/relatedvideo/${currentVideoId}`);
+        const { data } = await axios.get(`${BASE_URL}/api/vedio/relatedvideo/${currentVideoId}`);
         setRelatedVideos(data.data);
       } catch (err) {
         setRelatedVideos([]);
@@ -29,17 +31,14 @@ const RelatedVideo = ({ currentVideoId }) => {
 
   return (
     <div className="w-full max-w-sm">
-      {/* Header */}
       <div className="mb-4">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
           Related Videos
         </h2>
       </div>
 
-      {/* Content */}
       <div className="space-y-2">
         {loading ? (
-          // Loading skeleton
           <div className="space-y-3">
             {[...Array(5)].map((_, index) => (
               <div key={index} className="flex gap-3 p-3 animate-pulse">
@@ -53,7 +52,6 @@ const RelatedVideo = ({ currentVideoId }) => {
             ))}
           </div>
         ) : error ? (
-          // Error state
           <div className="text-center py-8">
             <div className="text-gray-400 mb-2">
               <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -68,7 +66,6 @@ const RelatedVideo = ({ currentVideoId }) => {
             </p>
           </div>
         ) : relatedVideos.length === 0 ? (
-          // Empty state
           <div className="text-center py-8">
             <div className="text-gray-400 mb-2">
               <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -80,7 +77,6 @@ const RelatedVideo = ({ currentVideoId }) => {
             </p>
           </div>
         ) : (
-          // Videos list
           relatedVideos.map((video) => (
             <RelatedVideoCard key={video._id} video={video} />
           ))

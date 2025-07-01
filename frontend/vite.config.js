@@ -7,14 +7,6 @@ export default defineConfig({
   plugins: [
     tailwindcss(),
     react()],
-    server: {
-    proxy: {
-      '/api': {
-        target: 'https://videoplay-project.onrender.com',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '')
-      }
-    }
-  }
+
     
 })
