@@ -1,0 +1,243 @@
+/* Classic and Beautiful Signup Form Styles */
+
+.page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #757ea5 0%, #383639 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  font-family: 'Georgia', 'Times New Roman', serif;
+}
+
+.container {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.1),
+    0 10px 20px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  padding: 40px;
+  width: 100%;
+  max-width: 450px;
+  position: relative;
+  overflow: hidden;
+}
+
+.container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #f5576c);
+  border-radius: 20px 20px 0 0;
+}
+
+.container form {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.container h2 {
+  text-align: center;
+  color: #2c3e50;
+  font-size: 2rem;
+  font-weight: 400;
+  margin-bottom: 10px;
+  letter-spacing: -0.5px;
+  position: relative;
+}
+
+.container h2::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  border-radius: 1px;
+}
+
+.container label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: #34495e;
+  font-weight: 500;
+  font-size: 0.95rem;
+  letter-spacing: 0.3px;
+}
+
+.container input {
+  padding: 15px 18px;
+  border: 2px solid #e8ecef;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-family: inherit;
+  background: #ffffff;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+  color: #2c3e50;
+}
+
+.container input:focus {
+  border-color: #667eea;
+  box-shadow: 
+    0 0 0 3px rgba(102, 126, 234, 0.1),
+    0 4px 12px rgba(102, 126, 234, 0.15);
+  transform: translateY(-1px);
+}
+
+.container input::placeholder {
+  color: #95a5a6;
+  font-style: italic;
+}
+
+.container input[type="file"] {
+  padding: 12px 18px;
+  background: #f8f9fa;
+  border: 2px dashed #bdc3c7;
+  cursor: pointer;
+  position: relative;
+}
+
+.container input[type="file"]:hover {
+  border-color: #667eea;
+  background: #f0f3ff;
+}
+
+.container input[type="file"]:focus {
+  border-color: #667eea;
+  border-style: solid;
+  background: #ffffff;
+}
+
+.container button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 16px 24px;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  position: relative;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.container button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.container button:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 10px 25px rgba(102, 126, 234, 0.3),
+    0 5px 15px rgba(102, 126, 234, 0.2);
+}
+
+.container button:hover::before {
+  left: 100%;
+}
+
+.container button:active {
+  transform: translateY(0);
+  box-shadow: 
+    0 5px 15px rgba(102, 126, 234, 0.2),
+    0 2px 8px rgba(102, 126, 234, 0.15);
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+  .page {
+    padding: 15px;
+  }
+  
+  .container {
+    padding: 30px 25px;
+    border-radius: 16px;
+  }
+  
+  .container h2 {
+    font-size: 1.75rem;
+  }
+  
+  .container form {
+    gap: 20px;
+  }
+  
+  .container input {
+    padding: 14px 16px;
+    font-size: 0.95rem;
+  }
+  
+  .container button {
+    padding: 15px 20px;
+    font-size: 1rem;
+  }
+}
+
+/* Accessibility Enhancements */
+.container input:focus-visible {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
+
+.container button:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+/* Animation for form appearance */
+.container {
+  animation: slideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Enhanced label styling */
+.container label {
+  position: relative;
+}
+
+.container label::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 0;
+  height: 1px;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  transition: width 0.3s ease;
+}
+
+.container label:focus-within::before {
+  width: 100%;
+}
