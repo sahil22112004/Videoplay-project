@@ -73,7 +73,7 @@ const WatchPage = () => {
         dislike: userDisliked ? prev.dislike - 1 : prev.dislike
       }));
 
-      await axios.put(`${BASE_URL}/api/vedio/like/${videoId}`, {}, {
+      await axios.put(`${BASE_URL}/vedio/like/${videoId}`, {}, {
         withCredentials: true,
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -102,7 +102,7 @@ const WatchPage = () => {
         likes: userLiked ? prev.likes - 1 : prev.likes
       }));
 
-      await axios.put(`${BASE_URL}/api/vedio/dislike/${videoId}`, {}, {
+      await axios.put(`${BASE_URL}/vedio/dislike/${videoId}`, {}, {
         withCredentials: true,
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -131,7 +131,7 @@ const WatchPage = () => {
           }
         }));
 
-        await axios.put(`${BASE_URL}/api/user/unsubscribe/${video.userId._id}`, {}, {
+        await axios.put(`${BASE_URL}/user/unsubscribe/${video.userId._id}`, {}, {
           withCredentials: true,
           headers: {
             "Authorization": `Bearer ${token}`,
@@ -150,7 +150,7 @@ const WatchPage = () => {
           }
         }));
 
-        await axios.put(`${BASE_URL}/api/user/subscribe/${video.userId._id}`, {}, {
+        await axios.put(`${BASE_URL}/user/subscribe/${video.userId._id}`, {}, {
           withCredentials: true,
           headers: {
             "Authorization": `Bearer ${token}`,
